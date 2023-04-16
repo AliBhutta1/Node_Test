@@ -1,42 +1,165 @@
-import { QueryInterface } from 'sequelize';
+import { QueryInterface, DataTypes } from 'sequelize';
 
 export default {
-  /**
-   # ToDo: Create a migration that creates all tables for the following user stories
+  up: async (queryInterface: QueryInterface): Promise<void> => {
+    await queryInterface.createTable('Movies', {
+      id: {
+        type: DataTypes.INTEGER,
+        allowNull: false,
+        autoIncrement: true,
+        primaryKey: true,
+      },
+      title: {
+        type: DataTypes.STRING,
+        allowNull: false,
+      },
+      description: {
+        type: DataTypes.TEXT,
+        allowNull: false,
+      },
+      duration: {
+        type: DataTypes.INTEGER,
+        allowNull: false,
+      },
+      rating: {
+        type: DataTypes.FLOAT,
+        allowNull: false,
+      },
+      genre: {
+        type: DataTypes.STRING,
+        allowNull: false,
+      },
+      release_date: {
+        type: DataTypes.DATE,
+        allowNull: false,
+      },
+    });
 
-   For an example on how a UI for an api using this might look like, please try to book a show at https://in.bookmyshow.com/.
-   To not introduce additional complexity, please consider only one cinema.
+    await queryInterface.createTable('Shows', {
+      id: {
+        type: DataTypes.INTEGER,
+        allowNull: false,
+        autoIncrement: true,
+        primaryKey: true,
+      },
+      start_time: {
+        type: DataTypes.DATE,
+        allowNull: false,
+      },
+      end_time: {
+        type: DataTypes.DATE,
+        allowNull: false,
+      },
+      movie_id: {
+        type: DataTypes.INTEGER,
+        allowNull: false,
+        references: {
+          model: 'Movies',
+          key: 'id',
+        },
+      },
+      room_id: {
+        type: DataTypes.INTEGER,
+        allowNull: false,
+        references: {
+          model: 'Rooms',
+          key: 'id',
+        },
+      },
+    });
 
-   Please list the tables that you would create including keys, foreign keys and attributes that are required by the user stories.
+    await queryInterface.createTable('Rooms', {
+      id: {
+        type: DataTypes.INTEGER,
+        allowNull: false,
+        autoIncrement: true,
+        primaryKey: true,
+      },
+      name: {
+        type: DataTypes.STRING,
+        allowNull: false,
+      },
+      capacity: {
+        type: DataTypes.INTEGER,
+        allowNull: false,
+      },
+      seat_type_premium: {
+        type: DataTypes.FLOAT,
+        allowNull: false,
+      },
+      cinema_id: {
+        type: DataTypes.INTEGER,
+        allowNull: false,
+        references: {
+          model: 'Cinemas',
+          key: 'id',
+        },
+      },
+    });
 
-   ## User Stories
+    await queryInterface.createTable('Seats', {
+      id: {
+        type: DataTypes.INTEGER,
+        allowNull: false,
+        autoIncrement: true,
+        primaryKey: true,
+      },
+      room_id: {
+        type: DataTypes.INTEGER,
+        allowNull: false,
+        references: {
+          model: 'Rooms',
+          key: 'id',
+        },
+      },
+      seat_number: {
+        type: DataTypes.INTEGER,
+        allowNull: false,
+      },
+      seat_type: {
+        type: DataTypes.STRING,
+        allowNull: false,
+      },
+    });
 
-   **Movie exploration**
-   * As a user I want to see which films can be watched and at what times
-   * As a user I want to only see the shows which are not booked out
-
-   **Show administration**
-   * As a cinema owner I want to run different films at different times
-   * As a cinema owner I want to run multiple films at the same time in different showrooms
-
-   **Pricing**
-   * As a cinema owner I want to get paid differently per show
-   * As a cinema owner I want to give different seat types a percentage premium, for example 50 % more for vip seat
-
-   **Seating**
-   * As a user I want to book a seat
-   * As a user I want to book a vip seat/couple seat/super vip/whatever
-   * As a user I want to see which seats are still available
-   * As a user I want to know where I'm sitting on my ticket
-   * As a cinema owner I don't want to configure the seating for every show
-   */
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  up: (queryInterface: QueryInterface): Promise<void> => {
-    throw new Error('TODO: implement migration in task 4');
+    await queryInterface.createTable('Bookings', {
+      id: {
+        type: DataTypes.INTEGER,
+        allowNull: false,
+        autoIncrement: true,
+        primaryKey: true,
+      },
+      show_id: {
+        type: DataTypes.INTEGER,
+        allowNull: false,
+        references: {
+          model: 'Shows',
+          key: 'id',
+        },
+      },
+      seat_id: {
+        type: DataTypes.INTEGER,
+        allowNull: false,
+        references: {
+          model: 'Seats',
+          key: 'id',
+        },
+      },
+      user_id: {
+        type: DataTypes.INTEGER,
+        allowNull: false,
+        references: {
+          model: 'Users',
+          key: 'id',
+        },
+      },
+    });
   },
 
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  down: (queryInterface: QueryInterface) => {
-    // do nothing
-  },
+  down: async (queryInterface: QueryInterface): Promise<void> => {
+    await queryInterface.dropTable('Bookings');
+    await queryInterface.dropTable('Seats');
+    await queryInterface.dropTable("Movies");
+    await queryInterface.dropTable("Users");
+  }
 };

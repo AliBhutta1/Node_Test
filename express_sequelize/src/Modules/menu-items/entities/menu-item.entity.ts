@@ -3,9 +3,14 @@ import {
   Column,
   Model,
   AutoIncrement,
-  PrimaryKey
+  PrimaryKey,
+  BelongsTo,
+  ForeignKey,
+  HasMany
 } from 'sequelize-typescript';
 import { ModelAttributeColumnOptions } from 'sequelize';
+
+import Event from '../../events/entities/event.entity';
 
 @Table({
   tableName: 'menu_item',
@@ -23,6 +28,7 @@ export default class MenuItem extends Model {
   @Column
   url: string;
 
+  @ForeignKey(() => MenuItem)
   @Column({
     type: 'integer',
     defaultValue: null,
@@ -31,4 +37,10 @@ export default class MenuItem extends Model {
 
   @Column({ type: 'datetime' } as ModelAttributeColumnOptions)
   declare createdAt: Date;
+
+  @BelongsTo(() => MenuItem, 'parentId')
+  parent: MenuItem;
+
+  @HasMany(() => MenuItem, 'parentId')
+  children: MenuItem[];
 }

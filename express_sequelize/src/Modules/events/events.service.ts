@@ -1,4 +1,7 @@
 import Event from './entities/event.entity';
+import Workshop from './entities/workshop.entity';
+import { Model } from 'sequelize';
+import { Sequelize, Op } from 'sequelize';
 
 
 export class EventsService {
@@ -84,9 +87,34 @@ export class EventsService {
     ```
      */
 
+
+
   async getEventsWithWorkshops() {
-    throw new Error('TODO task 1');
+    
+   
+    const events = await Event
+      .findAll({
+        attributes: ['id'],
+        include: [{
+          model: Workshop,
+        }],
+        group: ['Event.id']
+      });
+  
+    const eventIds = events.map((event: any) => event.id);
+  
+    // Get all events with those IDs and their associated workshops
+    const eventsWithWorkshops = await Event
+      .findAll({
+        where: {
+          id: { [Op.in]: eventIds }
+        },
+        include: [{ model: Workshop }]
+      });
+  
+    return eventsWithWorkshops;
   }
+    
 
   /* TODO: complete getFutureEventWithWorkshops so that it returns events with workshops, that have not yet started
     Requirements:
@@ -155,6 +183,30 @@ export class EventsService {
     ```
      */
   async getFutureEventWithWorkshops() {
-    throw new Error('TODO task 2');
+    // Get the IDs of all events with workshops that haven't started yet
+    const events = await Event
+      .findAll({
+        attributes: ['id'],
+        include: [{
+          model: Workshop,
+          where: {
+            start: { [Op.gt]: new Date() }
+          }
+        }],
+        group: ['Event.id']
+      });
+  
+    const eventIds = events.map((event: any) => event.id);
+  
+    // Get all events with those IDs and their associated workshops
+    const eventsWithWorkshops = await Event
+      .findAll({
+        where: {
+          id: { [Op.in]: eventIds }
+        },
+        include: [{ model: Workshop, where: { start: { [Op.gt]: new Date() } } }]
+      });
+  
+    return eventsWithWorkshops;
   }
 }

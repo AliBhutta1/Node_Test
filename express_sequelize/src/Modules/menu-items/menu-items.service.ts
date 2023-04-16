@@ -1,3 +1,6 @@
+import Event from '../events/entities/event.entity';
+import MenuItem from './entities/menu-item.entity';
+
 export class MenuItemsService {
 
   /* TODO: complete getMenuItems so that it returns a nested menu structure
@@ -76,6 +79,25 @@ export class MenuItemsService {
   */
 
   async getMenuItems() {
-    throw new Error('TODO in task 3');
+  
+    const menuItems = await MenuItem.findAll({
+        include: [
+          {
+            model: MenuItem,
+            as: 'children',
+            include: [
+              {
+                model: MenuItem,
+                as: 'children',
+                include: [
+                  // add more nested includes here as needed
+                ],
+              },
+            ],
+          },
+        ],
+    });
+
+    return menuItems;    
   }
 }
