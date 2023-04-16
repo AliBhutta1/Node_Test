@@ -1,7 +1,7 @@
 **Minimum Node Version: 16.5 or higher**
 
 Get started:
-
+- Go to 'express_sequelize' directory
 - run `npm i` to install all dependencies
 - change directory to whatever tech suites you best
 - run `npm run migrate`
